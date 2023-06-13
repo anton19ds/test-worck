@@ -1,0 +1,16 @@
+{
+  "name": "anton/testwork",
+  "autoload": {
+      "classmap": ["src"],
+      "psr-4": {
+          "Ssrc\\": "src/"
+      }
+  },
+  "authors": [
+      {
+          "name": "anton19ds",
+          "email": "bar2018ka@gmail.com"
+      }
+  ]
+  
+}

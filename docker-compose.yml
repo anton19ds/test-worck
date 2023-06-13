@@ -1,0 +1,45 @@
+version: '3'
+
+networks:
+  backend:
+
+services:
+  mysql-8:
+    image: mysql:8.0.21
+    command: --default-authentication-plugin=mysql_native_password --skip_name_resolve
+    container_name: mysql-8
+    restart: unless-stopped
+    volumes:
+      - ./mysql-8/data:/var/lib/mysql
+      - ./mysql-8/conf.d:/etc/mysql/conf.d
+      - ./mysql-8/logs:/var/log/mysql/
+      - ./mysql-8/dump:/dump
+    ports:
+      - "${MYSQL_8_PORT}:3306"
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: ${WORKSPACE_TIMEZONE}
+    networks:
+      - backend
+
+  php-8.0:
+    build:
+      context: php-8-workspace
+      dockerfile: Dockerfile
+      args:
+        DOCKER_PHP_VERSION: '8.0'
+        TZ: ${WORKSPACE_TIMEZONE}
+    working_dir: /var/www
+    container_name: php-8.0
+    volumes:
+      - ./.ssh:/home/www-data/.ssh
+      - ./projects:/var/www
+      - ./php-ini/8.0/php.ini:/usr/local/etc/php/php.ini
+      - ./php-workers/8.0/supervisor.d:/etc/supervisor.d
+    ports:
+      - "${PHP_8_0_PORT}:9000"
+    networks:
+      - backend
